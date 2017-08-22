@@ -1,11 +1,12 @@
 package main
 
 import (
-	_ "fmt"
 	"errors"
 	"fmt"
-)
+	"github.com/golang-collections/collections/stack"
 
+
+)
 
 func main() {
 	//arr := []int{2,3,1,0,2,5,3}
@@ -35,26 +36,38 @@ func main() {
 	//str = replaceBlank(str)
 	//fmt.Println(str)
 
-	linkList := createLinkListFromArr([]int{1,2,3,4,5})
-	printListReversingly(linkList)
+	//linkList := createLinkListFromArr([]int{1,2,3,4,5})
+	//printListReversingly(linkList)
 
+	//preOrder := []int{1,2,4,7,3,5,6,8}
+	//inOrder := []int{4,7,2,1,5,3,8,6}
+	//rootNode := rebuildBinaryTree(preOrder, inOrder)
+	//fmt.Println(travelTree(rootNode))
+
+	//q := cQueue{stack1: stack.New(), stack2: stack.New()}
+	//q.appendTail(1)
+	//q.appendTail(2)
+	//q.appendTail(3)
+	//fmt.Println(q.deleteHead())
+	//fmt.Println(q.deleteHead())
+	//fmt.Println(q.deleteHead())
+	//fmt.Println(q.deleteHead())
 
 }
 
-
 // 面试题1
-func findDump(arr []int) (int,  error){
+func findDump(arr []int) (int, error) {
 	if arr == nil || len(arr) == 0 {
 		return 0, errors.New("empty arr found")
 	}
 
 	for i := 0; i < len(arr); i++ {
-		if arr[i] < 0 || arr[i] > (len(arr) - 1) {
+		if arr[i] < 0 || arr[i] > (len(arr)-1) {
 			return 0, errors.New("invalid element found")
 		}
 	}
 
-    for  i := 0; i < len(arr); i++ {
+	for i := 0; i < len(arr); i++ {
 		for arr[i] != i {
 			if arr[i] == arr[arr[i]] {
 				return arr[i], nil
@@ -82,8 +95,8 @@ func findDump2(arr []int) (int, error) {
 	var start int = 1
 	var end int = len(arr) - 1
 	for end >= start {
-		var middle int = ((end - start) >> 1 ) + start
-		var count int =  countRange(arr, start, middle)
+		var middle int = ((end - start) >> 1) + start
+		var count int = countRange(arr, start, middle)
 		if end == start {
 			if count > 1 {
 				return start, nil
@@ -109,13 +122,12 @@ func countRange(arr []int, start, middle int) int {
 
 	var count int = 0
 	for i := 0; i < len(arr); i++ {
-	   if arr[i] >= start && arr[i] <= middle {
-		   count++
-	   }
+		if arr[i] >= start && arr[i] <= middle {
+			count++
+		}
 	}
 	return count
 }
-
 
 // 面试题4
 func findInMetrix(arr [][]int, number int) bool {
@@ -151,7 +163,7 @@ func replaceBlank(str string) string {
 		}
 	}
 
-	bstr := make([]byte, len(bbstr), blankNumber * 2 + len(str))
+	bstr := make([]byte, len(bbstr), blankNumber*2+len(str))
 
 	for i, char := range bbstr {
 		bstr[i] = char
@@ -161,12 +173,12 @@ func replaceBlank(str string) string {
 
 	for i := len(bbstr) - 1; i >= 0; i-- {
 		if bstr[i] == ' ' {
-			bstr[i + 2 * (blankNumber - 1)] = '%'
-			bstr[i + 2 * (blankNumber - 1) + 1] = '2'
-			bstr[i + 2 * (blankNumber - 1) + 2] = '0'
+			bstr[i+2*(blankNumber-1)] = '%'
+			bstr[i+2*(blankNumber-1)+1] = '2'
+			bstr[i+2*(blankNumber-1)+2] = '0'
 			blankNumber--
 		} else {
-			bstr[i + 2 * blankNumber] = bstr[i]
+			bstr[i+2*blankNumber] = bstr[i]
 		}
 	}
 	return string(bstr)
@@ -175,7 +187,7 @@ func replaceBlank(str string) string {
 // 面试题6
 type LinkNode struct {
 	value int
-	next *LinkNode
+	next  *LinkNode
 }
 
 func createLinkListFromArr(arr []int) *LinkNode {
@@ -206,4 +218,81 @@ func printListReversingly(node *LinkNode) {
 
 	printListReversingly(node.next)
 	fmt.Println(node.value)
+}
+
+type TreeNode struct {
+	value int
+	left  *TreeNode
+	right *TreeNode
+}
+
+// 面试题7
+func rebuildBinaryTree(preOrder []int, inOrder []int) *TreeNode {
+	if len(preOrder) == 0 {
+		return nil
+	}
+
+	if len(preOrder) == 1 {
+		leaf := TreeNode{value: preOrder[0]}
+		return &leaf
+	}
+
+	for _, ele := range preOrder {
+		for i := 0; i < len(inOrder); i++ {
+			if ele == inOrder[i] {
+				leftSub := inOrder[:i]
+				left := rebuildBinaryTree(preOrder[1:(1+len(leftSub))], leftSub)
+				right := rebuildBinaryTree(preOrder[(1+len(leftSub)):], inOrder[(i+1):])
+				var rootNode TreeNode = TreeNode{value: ele, left: left, right: right}
+				return &rootNode
+			}
+		}
+	}
+	return nil
+}
+
+func travelTree(rootNode *TreeNode) []int {
+	var ret []int
+	if rootNode == nil {
+		return ret
+	}
+	ret = append(ret, rootNode.value)
+	leftRet := travelTree(rootNode.left)
+	rightRet := travelTree(rootNode.right)
+
+	for _, ele := range leftRet {
+		ret = append(ret, ele)
+	}
+	for _, ele := range rightRet {
+		ret = append(ret, ele)
+	}
+	return ret
+}
+
+type cQueue struct{
+	stack1 *stack.Stack
+    stack2  *stack.Stack
+}
+
+func (q *cQueue) appendTail(ele interface{}) {
+	q.stack1.Push(ele)
+}
+
+func (q *cQueue) deleteHead() interface{} {
+	var ret, ele interface{}
+	for true {
+		ele = q.stack1.Pop();
+		if q.stack1.Len() == 0 {
+			ret = ele
+			break
+		} else {
+			q.stack2.Push(ele)
+		}
+	}
+
+	for q.stack2.Len() > 0 {
+		q.stack1.Push(q.stack2.Pop())
+	}
+
+	return ret
 }
