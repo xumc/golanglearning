@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/golang-collections/collections/stack"
-
+	"math"
 
 )
 
@@ -52,6 +52,14 @@ func main() {
 	//fmt.Println(q.deleteHead())
 	//fmt.Println(q.deleteHead())
 	//fmt.Println(q.deleteHead())
+
+	//fmt.Println(sum(4, 200))
+
+	world := make([][]bool, 8)
+	for i := 0; i < 8; i++ {
+		world[i] = make([]bool, 8)
+	}
+	queens(world, 8, 0, 0)
 
 }
 
@@ -295,4 +303,78 @@ func (q *cQueue) deleteHead() interface{} {
 	}
 
 	return ret
+}
+
+// 写一个函数，求两个整数的之和，要求在函数体内不得使用＋、－、×、÷。
+func sum(a, b int) int {
+	if b == 0 {
+		return a
+	}
+
+	s := a ^ b
+	add := (a & b) << 1
+	return sum(s, add)
+}
+
+// 求1+2+…+n，要求不能使用乘除法、for、while、if、else、switch、case等关键字以及条件判断语句（A?B:C）
+func accumulativeumS(n int) int {
+	return (1 + n) *n / 2
+}
+
+
+var (
+	count = 0
+)
+
+// 在8×8的国际象棋上摆放八个皇后，使其不能相互攻击，即任意两个皇后不得处在同一行、同一列或者同一对角斜线上。下图中的每个黑色格子表示一个皇后，这就是一种符合条件的摆放方法。请求出总共有多少种摆法。
+func queens(chessBoard [][]bool, queensNumber int, startX, startY int) {
+	printChessBoard(chessBoard)
+	if queensNumber <= 0 {
+		count++
+		return
+	}
+
+	for i := startX; i < len(chessBoard); i++ {
+		for j := startY; j < len(chessBoard[i]); j++ {
+			chessBoard[i][j] = true
+			if validate(chessBoard, i, j) {
+				queens(chessBoard, queensNumber - 1, i, j)
+			}
+			chessBoard[i][j] = false
+		}
+	}
+
+}
+
+func validate(chessBoard [][]bool, x, y int) bool {
+	for i := 0; i <= x; i++ {
+		for j := 0; j < len(chessBoard[i]); j++ {
+			if i == x {
+				if j >= y {
+					return true
+				}
+			}
+			if chessBoard[i][j] == true {
+				if i == x {
+					return false
+				}
+				if j == y {
+					return false
+				}
+				if math.Abs(float64(x - i)) == math.Abs(float64(y - j)) {
+					return false
+				}
+			}
+		}
+	}
+	return true
+}
+
+func printChessBoard(chessBoard [][]bool) {
+	for i := 0; i <= len(chessBoard); i++ {
+		for j := 0; j < len(chessBoard[i]); j++ {
+			fmt.Print(chessBoard[i][j], ",")
+		}
+		fmt.Println("")
+	}
 }
