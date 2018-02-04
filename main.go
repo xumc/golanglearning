@@ -6,9 +6,26 @@ import (
 	"github.com/golang-collections/collections/stack"
 	"math"
 
+	"sort"
+	"strings"
 )
 
+
+type user struct{
+	Age int
+	Name string
+}
+func (u *user)notify() {
+	fmt.Printf("%d %s", u.Age, u.Name)
+	u.Age = 20
+}
 func main() {
+
+	u := &user{10, "mxu"}
+	u.notify()
+
+	u.notify()
+
 	//arr := []int{2,3,1,0,2,5,3}
 	//fmt.Println(findDump(arr))
 
@@ -55,12 +72,19 @@ func main() {
 
 	//fmt.Println(sum(4, 200))
 
-	world := make([][]bool, 8)
-	for i := 0; i < 8; i++ {
-		world[i] = make([]bool, 8)
-	}
-	queens(world, 8, 0, 0)
+	//world := make([][]bool, 8)
+	//for i := 0; i < 8; i++ {
+	//	world[i] = make([]bool, 8)
+	//}
+	//queens(world, 8, 0, 0)
 
+	//dis := hammingDistance(1, 4)
+	//fmt.Println(dis)
+
+	//fmt.Println(findComplement(5))
+	//fmt.Println(findWords([]string{"Hello","Alaska","Dad","Peace",}))
+
+	//fmt.Println(reverseWords("Let's take LeetCode contest"))
 }
 
 // 面试题1
@@ -377,4 +401,171 @@ func printChessBoard(chessBoard [][]bool) {
 		}
 		fmt.Println("")
 	}
+}
+
+
+// https://leetcode.com/problems/hamming-distance/description/
+func hammingDistance(x int, y int) int {
+	var count = 0
+	var xor int = x ^ y
+
+	for xor != 0 {
+		if xor % 2 == 1 {
+			count++
+		}
+		xor = xor >> 1
+	}
+
+	return count
+
+}
+
+// https://leetcode.com/problems/judge-route-circle/description/
+func judgeCircle(moves string) bool {
+    var hc, vc int
+    var length int = len(moves)
+
+    for i := 0; i < length; i++ {
+    	if moves[i] == 'R' {
+    		hc++
+		} else if moves[i] == 'L' {
+			hc--
+		} else if moves[i] == 'U' {
+			vc++
+		} else if moves[i] == 'D' {
+			vc--
+		}
+	}
+
+	return hc == 0 && vc == 0
+}
+
+
+/**
+ * https://leetcode.com/problems/merge-two-binary-trees/description/
+ */
+//func mergeTrees(t1 *TreeNode, t2 *TreeNode) *TreeNode {
+//	if t1 == nil {
+//		return t2
+//	}
+//
+//	if t2 == nil {
+//		return t1
+//	}
+//
+//	value := t1.Val + t2.Val
+//
+//	left := mergeTrees(t1.Left, t2.Left)
+//
+//	right := mergeTrees(t1.Right, t2.Right)
+//
+//	return &TreeNode{
+//		Val: value,
+//		Left: left,
+//		Right: right,
+//	}
+//}
+
+
+// https://leetcode.com/problems/array-partition-i/discuss/
+func arrayPairSum(nums []int) int {
+	sort.Ints(nums)
+
+	var count int
+	for i := 0; i < len(nums); i+=2 {
+		count += nums[i]
+	}
+
+	return count
+}
+
+// https://leetcode.com/problems/number-complement/description/
+func findComplement(num int) int {
+	var re float64
+	var i float64 = 0
+	for num > 0 {
+		if num & 1 != 1 {
+			re += math.Pow(2, i)
+		}
+
+		num = num >> 1
+
+		i++
+
+	}
+
+	return int(re)
+
+}
+
+// https://leetcode.com/problems/keyboard-row/description/
+func findWords(words []string) []string {
+	m := map[string]int{
+		"q": 1,
+		"w": 1,
+		"e": 1,
+		"r": 1,
+		"t": 1,
+		"y": 1,
+		"u": 1,
+		"i": 1,
+		"o": 1,
+		"p": 1,
+		"a": 2,
+		"s": 2,
+		"d": 2,
+		"f": 2,
+		"g": 2,
+		"h": 2,
+		"j": 2,
+		"k": 2,
+		"l": 2,
+		"z": 3,
+		"x": 3,
+		"c": 3,
+		"v": 3,
+		"b": 3,
+		"n": 3,
+		"m": 3,
+	}
+
+	var re = []string{}
+
+	for _, word := range words {
+		var match bool = true
+		wordLower := strings.ToLower(word)
+
+		lineNum := m[string(wordLower[0])]
+		for i := 1; i < len(wordLower); i++ {
+			if m[string(wordLower[i])] != lineNum {
+				match = false
+				break
+			}
+		}
+
+		if match {
+			re = append(re, word)
+		}
+	}
+
+	return re
+}
+
+func reverseWords(s string) string {
+	re := []string{}
+	words := strings.Split(s, " ")
+	for _, word := range words {
+		reversedWord := ""
+		for i := (len(word) - 1); i >= 0; i-- {
+			reversedWord += string(word[i])
+		}
+		re = append(re, reversedWord)
+	}
+
+	return strings.Join(re, " ")
+}
+
+// https://leetcode.com/problems/distribute-candies/description/
+func distributeCandies(candies []int) int {
+	return 0
 }
